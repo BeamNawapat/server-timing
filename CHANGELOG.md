@@ -1,3 +1,8 @@
+
+# 1.3.0-exp.0 - 23 Apr 2025
+Change:
+- Add support for Elysia 1.3
+
 # 1.2.1 - 17 Feb 2025
 Bug fix:
 - [#9](https://github.com/elysiajs/server-timing/pull/9) broken metrics format
