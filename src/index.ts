@@ -94,18 +94,18 @@ const getLabel = (
 	) => unknown,
 	write: (value: string) => void
 ) => {
-	listener(async ({ onStop, onEvent, total }) => {
+	listener(async function traceEventListener({ onStop, onEvent, total }) {
 		let label = ''
 
 		if (total === 0) return
 
-		onEvent(({ name, index, onStop }) => {
+		onEvent(function eventProcessor({ name, index, onStop }) {
 			onStop(({ elapsed }) => {
 				label += `${event}.${index}.${name || 'anon'};dur=${elapsed},`
 			})
 		})
 
-		onStop(({ elapsed }) => {
+		onStop(function recordEventTiming({ elapsed }) {
 			label += `${event};dur=${elapsed},`
 
 			write(label)
@@ -133,7 +133,7 @@ export const serverTiming = ({
 	if (enabled) {
 		app.trace(
 			{ as: 'global' },
-			async ({
+			async function serverTimingTraceHandler({
 				onRequest,
 				onParse,
 				onTransform,
@@ -147,7 +147,7 @@ export const serverTiming = ({
 				context: {
 					request: { method }
 				}
-			}) => {
+			}) {
 				let label = ''
 
 				const write = (nextValue: string) => {
@@ -156,7 +156,7 @@ export const serverTiming = ({
 
 				let start: number
 
-				onRequest(({ begin }) => {
+				onRequest(function captureRequestStart({ begin }) {
 					start = begin
 				})
 
@@ -178,8 +178,8 @@ export const serverTiming = ({
 						})
 					})
 
-				onMapResponse(({ onStop }) => {
-					onStop(async ({ end }) => {
+				onMapResponse(function setupResponseTiming({ onStop }) {
+					onStop(async function finalizeServerTiming({ end }) {
 						let allowed = allow
 						if (allowed instanceof Promise) allowed = await allowed
 
